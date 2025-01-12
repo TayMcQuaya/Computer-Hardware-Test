@@ -36,7 +36,7 @@ const AudioTest = ({ onComplete }) => {
 
         <audio
           ref={audioRef}
-          src="/test-audio.mp3"
+          src={`${import.meta.env.BASE_URL}test-audio.mp3`}
           onEnded={() => setIsPlaying(false)}
         />
 

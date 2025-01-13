@@ -1,15 +1,27 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 
 const AudioTest = ({ onComplete }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioError, setAudioError] = useState(null);
   const audioRef = useRef(null);
+
+  useEffect(() => {
+    console.log('Base URL:', import.meta.env.BASE_URL);
+    console.log('Full audio path:', `${import.meta.env.BASE_URL}test-audio.mp3`);
+  }, []);
 
   const togglePlayPause = () => {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('Audio playback error:', error);
+          setAudioError(error.message);
+        });
+      }
     }
     setIsPlaying(!isPlaying);
   };
@@ -34,10 +46,18 @@ const AudioTest = ({ onComplete }) => {
           </button>
         </div>
 
+        {audioError && (
+          <p className="text-red-500 mb-4">Error: {audioError}</p>
+        )}
+
         <audio
           ref={audioRef}
           src={`${import.meta.env.BASE_URL}test-audio.mp3`}
           onEnded={() => setIsPlaying(false)}
+          onError={(e) => {
+            console.error('Audio loading error:', e);
+            setAudioError('Failed to load audio file');
+          }}
         />
 
         <button

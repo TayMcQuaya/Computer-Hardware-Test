@@ -6,9 +6,24 @@ const AudioTest = ({ onComplete }) => {
   const [audioError, setAudioError] = useState(null);
   const audioRef = useRef(null);
 
+  // Get the repository name from the BASE_URL
+  const repoName = 'Computer-Hardware-Test';
+  const audioUrl = `https://taymcquaya.github.io/${repoName}/test-audio.mp3`;
+
   useEffect(() => {
-    console.log('Base URL:', import.meta.env.BASE_URL);
-    console.log('Full audio path:', `${import.meta.env.BASE_URL}test-audio.mp3`);
+    console.log('Audio URL:', audioUrl);
+    // Try to fetch the audio file to verify it exists
+    fetch(audioUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log('Audio file is accessible');
+      })
+      .catch(error => {
+        console.error('Audio file fetch error:', error);
+        setAudioError('Could not access audio file');
+      });
   }, []);
 
   const togglePlayPause = () => {
@@ -52,7 +67,7 @@ const AudioTest = ({ onComplete }) => {
 
         <audio
           ref={audioRef}
-          src={`${import.meta.env.BASE_URL}test-audio.mp3`}
+          src={audioUrl}
           onEnded={() => setIsPlaying(false)}
           onError={(e) => {
             console.error('Audio loading error:', e);
